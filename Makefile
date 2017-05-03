@@ -35,7 +35,7 @@ CFLAGS=-c -Wall
 
 SOURCES = cdnsd.cpp
 
-EXECUTABLE = cdnsd
+EXECUTABLE = cdnsd-bin
 
 OBJECTS=$(SOURCES:.cpp=.o)
 
