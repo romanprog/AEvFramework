@@ -11,7 +11,7 @@ class AEventAbstract : public std::enable_shared_from_this<AEventAbstract>
     friend class AEventUtilBase;
 
 public:
-
+    // TEst Comment for git
     // Derived class must have 1 constructor with const AEvChildConf (in case it could not be root) or
     // 2 constructors with const AEvChildConf and AEvRootConf args. Conf args must be translated to base class.
     explicit AEventAbstract(AEvRootConf & config);
