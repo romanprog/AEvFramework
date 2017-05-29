@@ -33,7 +33,13 @@ CXXFLAGS +=  $(STDLIB)
 
 CFLAGS=-c -Wall
 
-SOURCES = cdnsd.cpp
+SOURCES = cdnsd.cpp \
+	  Config/GlobalConf.cpp \
+	  Logger/Logger.cpp \
+	  AsyncEvent/AEvBase/AEventAbstract.cpp \
+	  AsyncEvent/SysSig/AEvSysSig.cpp \
+	  HUtils/HStrings.cpp \
+	  HUtils/HNet.cpp
 
 EXECUTABLE = cdnsd-bin
 
@@ -48,5 +54,5 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(ASIO_STANDALONE_FLAG) $(INCLUDES) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm $(OBJECTS) $(EXECUTABLE) $(TESTING_OBJ) $(TESTING_EXEC)
+	rm -f $(OBJECTS) $(EXECUTABLE) $(TESTING_OBJ) $(TESTING_EXEC)
 
