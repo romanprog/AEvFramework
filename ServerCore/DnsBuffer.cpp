@@ -80,3 +80,8 @@ void DnsBuffer::when_new_data_acc(size_t bytes_readed)
 
 
 
+
+size_t DnsReadBuffer::calculate_mem(size_t block_size)
+{
+    return 0;
+}

@@ -1,12 +1,11 @@
 #include "BuffAbstract.hpp"
 #include "../../Logger/Logger.hpp"
 
-BuffAbstract::BuffAbstract()
-    : _reserved(calculate_mem(_basic_block_size))
+BuffAbstract::BuffAbstract(size_t block_size_, size_t reserve_block_count_)
+    : _basic_block_size(block_size_),
+      _reserve_block_count(reserve_block_count_),
+      _reserved(calculate_mem(_basic_block_size))
 {
-    // In this case will be called _mem_calc() of base class, as need to allocate first memory block.
-    // Override _mem_calc() in derived classes to make own memory managment in release() method
-    // and other memory managers of derived classes.
     _cdata = static_cast<char *>(malloc(_reserved));
 }
 
@@ -57,15 +56,11 @@ void BuffAbstract::release(size_t size)
 
     size_t _reserved_free = _reserved - _top_offset;
 
-    if (_reserved_free <= size) {
+    if (_reserved_free < size) {
         _reserved = calculate_mem(size);
         _cdata = static_cast<char *>(realloc(_cdata, _reserved));
     }
     _size = _top_offset + size;
-
-    if (_size == _top_offset) {
-        return;
-    }
 
 }
 
@@ -119,9 +114,8 @@ void BuffAbstract::operator <<(const std::string &str)
 
 size_t BuffAbstract::calculate_mem(size_t block_size)
 {
-    size_t reserve_bl_count {2};
     // Base mem reserv calculate. 1 block for data needeng + 1 free block.
-    return ((_top_offset + size_filled()) / block_size + reserve_bl_count) * block_size;
+    return size_filled() + block_size * (_reserve_block_count + 1);
 }
 
 void BuffAbstract::when_new_data_acc(size_t bytes_readed)

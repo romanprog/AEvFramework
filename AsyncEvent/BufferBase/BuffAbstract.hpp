@@ -8,7 +8,9 @@
 class BuffAbstract
 {
 public:
-    BuffAbstract();
+//    BuffAbstract();
+    BuffAbstract(size_t  block_size_ = 1024, size_t reserve_block_count_ = 1);
+
     virtual ~BuffAbstract();
 
     // Return pointer to first byte of read-only buffer data.
@@ -65,7 +67,8 @@ protected:
     void reset_size();
 
 private:
-    size_t _basic_block_size {1024};
+    const size_t _basic_block_size;
+    const size_t _reserve_block_count;
     size_t _top_offset {0};
     size_t _reserved {0};
     size_t _size {0};
