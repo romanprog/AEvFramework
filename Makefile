@@ -34,7 +34,11 @@ CXXFLAGS +=  $(STDLIB)
 CFLAGS=-c -Wall
 
 SOURCES = cdnsd.cpp \
-	  ServerCore/Listeners.cpp \
+	  ServerCore/Controller.cpp \
+	  ServerCore/Workers.cpp \
+	  ServerCore/Acceptors.cpp \
+	  ServerCore/DnsBuffer.cpp \
+	  ServerCore/DnsUtils.cpp \
 	  Config/GlobalConf.cpp \
 	  Logger/Logger.cpp \
 	  AsyncEvent/AEvBase/AEventAbstract.cpp \

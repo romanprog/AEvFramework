@@ -1,43 +1,38 @@
-#include "Listeners.hpp"
-#include "../AsyncEvent/SysSig/AEvSysSig.hpp"
+#include "Acceptors.hpp"
 #include "DnsBuffer.hpp"
 #include "../HUtils/HNet.hpp"
+#include "../AsyncEvent/SysSig/AEvSysSig.hpp"
 
-
-#include <iostream>
-#include <thread>
-#include <chrono>
-
-
-
-ListenerTCP::ListenerTCP(aev::AEvRootConf &config, const std::__cxx11::string &ip, const unsigned port)
+AcceptorTCP::AcceptorTCP(aev::AEvRootConf &config, const std::string &ip, const unsigned port)
     :aev::AEventAbstract(config),
       _acceptor(_ev_loop->get_io_service()),
       _socket(_ev_loop->get_io_service()),
       _conn_ip(ip),
       _conn_port(port)
 {
-    log_debug_aev("ListenerBase CONSTRUCTOR! ");
+
+    log_debug_aev("AcceptorTCPBase CONSTRUCTOR! ");
 }
 
-ListenerTCP::ListenerTCP(aev::AEvChildConf &&config, const std::__cxx11::string &ip, const unsigned port)
+AcceptorTCP::AcceptorTCP(aev::AEvChildConf &&config, const std::string &ip, const unsigned port)
     :aev::AEventAbstract(std::move(config)),
       _acceptor(_ev_loop->get_io_service()),
       _socket(_ev_loop->get_io_service()),
       _conn_ip(ip),
       _conn_port(port)
 {
-    log_debug_aev("ListenerBase CONSTRUCTOR! ");
+    log_debug_aev("AcceptorTCPBase CONSTRUCTOR! ");
 }
 
-ListenerTCP::~ListenerTCP()
+AcceptorTCP::~AcceptorTCP()
 {
     log_debug("AEvAcceptor DESTRUCTOR! ");
 }
 
-void ListenerTCP::_ev_begin()
+void AcceptorTCP::_ev_begin()
 {
     if (!hnet::is_ip_v4(_conn_ip)) {
+        log_main("Error! Wrong IP: %", _conn_ip);
         stop();
         return;
     }
@@ -54,26 +49,26 @@ void ListenerTCP::_ev_begin()
     _start_acceept();
 }
 
-void ListenerTCP::_ev_finish() {}
+void AcceptorTCP::_ev_finish() {}
 
-void ListenerTCP::_ev_stop()
+void AcceptorTCP::_ev_stop()
 {
     asio::error_code ec;
     _acceptor.cancel(ec);
     log_debug_aev("AEvConnection _ev_stop: %", ec.value());
 }
 
-void ListenerTCP::_ev_timeout()
+void AcceptorTCP::_ev_timeout()
 {
 
 }
 
-void ListenerTCP::_ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal &_ret)
+void AcceptorTCP::_ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal &_ret)
 {
 
 }
 
-void ListenerTCP::_start_acceept()
+void AcceptorTCP::_start_acceept()
 {
     using namespace std::placeholders;
 
@@ -97,3 +92,5 @@ void ListenerTCP::_start_acceept()
                            })
             );
 }
+
+

@@ -1,5 +1,5 @@
 #include "DnsUtils.hpp"
-#include "../../HUtils/HStrings.hpp"
+#include "../HUtils/HStrings.hpp"
 
 #include <algorithm>
 #include <arpa/inet.h>

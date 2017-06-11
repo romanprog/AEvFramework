@@ -45,21 +45,16 @@ class DnsReadBuffer : public BuffAbstract
 public:
     DnsReadBuffer();
 
-    dns::DnsError get_error() const
+    inline dns::DnsError get_error() const
     {
         return err;
     }
-
-    dns::DnsRespondPtr withdraw_respond();
 
     void clear();
 
 private:
 
-    virtual size_t calculate_mem(size_t block_size) override;
     dns::DnsError err;
-
-    bool redy_for_respond {false};
     dns::DnsRequest _request;
     dns::DnsRespondPtr _respond_ptr;
 };

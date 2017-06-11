@@ -1,10 +1,11 @@
 #include <iostream>
 #include <string>
 #include "AsyncEvent/AEvBase/AEventAbstract.hpp"
-#include "ServerCore/Listeners.hpp"
+#include "ServerCore/Controller.hpp"
 #include "AsyncEvent/AEvBase/AEventTypes.hpp"
 #include "Config/GlobalConf.hpp"
 #include "TmpForTests.hpp"
+
 
 auto cb = [](aev::AEvPtrBase tptr, aev::AEvExitSignal sin_num) -> int
 {
@@ -12,23 +13,12 @@ auto cb = [](aev::AEvPtrBase tptr, aev::AEvExitSignal sin_num) -> int
     return 0;
 };
 
+
 int main (int argc, char* argv[]) {
 
+
     std::cout << "Helo World!!" << std::endl;
-    // aev::AEventUtilBase ut;
-    DnsReadBufferT buff;
-    buff.release(5000);
-    for (int i = 0; i < 400; ++i ) {
-        log_main("% %",buff.size_avail(), i);
-        memcpy(buff.data_top(),"1234567890", 10);
-        buff.accept(10);
-
-    }
-
-    buff.release(7000);
-
-    exit(0);
-
+#if 0
     try
     {
       if (argc != 2)
@@ -49,6 +39,7 @@ int main (int argc, char* argv[]) {
     }
 
     return 0;
+#endif
 
     if (!Config::glob().read_config("main.conf")) {
         log_main("Can't load config file. %", Config::glob().error_text());
@@ -56,7 +47,7 @@ int main (int argc, char* argv[]) {
     }
 
     aev::AEvRootConf main_conf(cb);
-    std::shared_ptr<ListenerTCP> conn = std::make_shared<ListenerTCP>(main_conf, "0.0.0.0", 5338);
+    std::shared_ptr<Controller> conn = std::make_shared<Controller>(main_conf);
     conn->begin();
     conn->run();
 

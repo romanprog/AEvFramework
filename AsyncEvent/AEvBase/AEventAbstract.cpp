@@ -133,6 +133,10 @@ int AEventAbstract::_child_callback(AEvPtrBase _child, AEvExitSignal _ret)
     // log_debug_aev("Try call _ev_child_callback ");
     _ev_child_callback(_child, _ret);
 
+    // If no childs - stop event.
+    if (_child_ev_list.empty())
+        stop();
+
     return 0;
 }
 
