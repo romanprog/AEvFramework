@@ -60,7 +60,7 @@ void AEventAbstract::finish()
 {
       _timer.cancel();
     //log_debug_aev("Try call _ev_finish ");
-    _ev_finish();
+    _evFinish();
     _finish_callback(std::move(_my_ptr), _ev_exit_signal);
 }
 

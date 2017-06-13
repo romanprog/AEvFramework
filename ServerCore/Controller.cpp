@@ -15,18 +15,18 @@
 Controller::Controller(aev::AEvRootConf &config)
     :aev::AEventAbstract(config)
 {
-    log_debug_aev("ListenerBase CONSTRUCTOR! ");
+    log_debug_aev("Controller CONSTRUCTOR! ");
 }
 
 Controller::Controller(aev::AEvChildConf &&config)
     :aev::AEventAbstract(std::move(config))
 {
-    log_debug_aev("ListenerBase CONSTRUCTOR! ");
+    log_debug_aev("Controller CONSTRUCTOR! ");
 }
 
 Controller::~Controller()
 {
-    log_debug("AEvAcceptor DESTRUCTOR! ");
+    log_debug("Controller DESTRUCTOR! ");
 }
 
 void Controller::_ev_begin()
@@ -34,12 +34,12 @@ void Controller::_ev_begin()
     _start_acceeptors();
 }
 
-void Controller::_ev_finish() {}
+void Controller::_evFinish() {}
 
 void Controller::_ev_stop()
 {
     asio::error_code ec;
-    log_debug_aev("AEvConnection _ev_stop: %", ec.value());
+    log_debug_aev("Controller _ev_stop: %", ec.value());
 }
 
 void Controller::_ev_timeout()

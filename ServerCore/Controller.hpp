@@ -24,7 +24,7 @@ private:
     ConfigData &_main_config {Config::glob().get_conf()};
 
     virtual void _ev_begin() override;
-    virtual void _ev_finish() override;
+    virtual void _evFinish() override;
     virtual void _ev_stop() override;
     virtual void _ev_timeout() override;
     virtual void _ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal & _ret) override;

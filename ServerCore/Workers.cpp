@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-DnsTCPSession::DnsTCPSession(aev::AEvChildConf &&config,
+DnsTCPWorker::DnsTCPWorker(aev::AEvChildConf &&config,
                                asio::ip::tcp::socket &&_soc,
                                ConfigData main_conf_)
 
@@ -16,22 +16,22 @@ DnsTCPSession::DnsTCPSession(aev::AEvChildConf &&config,
      log_debug_aev("AEvConnection CONSTRUCTOR! ");
 }
 
-DnsTCPSession::~DnsTCPSession()
+DnsTCPWorker::~DnsTCPWorker()
 {
     log_debug_aev("AEvConnection DESTRUCT" );
 }
 
-void DnsTCPSession::_ev_begin()
+void DnsTCPWorker::_ev_begin()
 {
     log_debug_aev("AEvConnection START");
 }
 
-void DnsTCPSession::_ev_finish()
+void DnsTCPWorker::_evFinish()
 {
     log_debug_aev("AEvConnection FINISH");
 }
 
-void DnsTCPSession::_ev_stop()
+void DnsTCPWorker::_ev_stop()
 {
     log_debug_aev("AEvConnection STOP");
     _ev_exit_signal = aev::AEvExitSignal::close_connection;
@@ -39,17 +39,17 @@ void DnsTCPSession::_ev_stop()
     _socket.close();
 }
 
-void DnsTCPSession::_ev_timeout()
+void DnsTCPWorker::_ev_timeout()
 {
     log_debug_aev("AEvConnection TIMEOUT");
 }
 
-void DnsTCPSession::_ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal &_ret)
+void DnsTCPWorker::_ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal &_ret)
 {
 
 }
 
-void DnsTCPSession::_receive_request()
+void DnsTCPWorker::_receive_request()
 {
     read_buffer->release(1024);
     log_debug_aev("AEvConnection ADD NEW HANDLER");
@@ -65,14 +65,14 @@ void DnsTCPSession::_receive_request()
                             }));
 }
 
-void DnsTCPSession::_db_search(DnsReadBufferPtr buff_)
+void DnsTCPWorker::_db_search(DnsReadBufferPtr buff_)
 {
 
 }
 
 
 
-void DnsTCPSession::_send_respond(std::string data)
+void DnsTCPWorker::_send_respond(std::string data)
 {
 
     log_debug_aev("AEvConnection ADD NEW HANDLER");
@@ -89,3 +89,42 @@ void DnsTCPSession::_send_respond(std::string data)
 }
 
 
+
+DnsUDPWorker::DnsUDPWorker(aev::AEvChildConf &&config, ConfigData main_conf_, asio::ip::udp::endpoint &&r_epoint_, DnsReadBufferPtr buff_)
+    : AEventAbstract::AEventAbstract(std::move(config)),
+      _remote_endpoint(std::move(r_epoint_)),
+      _main_config(std::move(main_conf_)),
+      _read_buffer(buff_)
+{
+
+}
+
+DnsUDPWorker::~DnsUDPWorker()
+{
+
+}
+
+void DnsUDPWorker::_ev_begin()
+{
+
+}
+
+void DnsUDPWorker::_evFinish()
+{
+
+}
+
+void DnsUDPWorker::_ev_stop()
+{
+
+}
+
+void DnsUDPWorker::_ev_timeout()
+{
+
+}
+
+void DnsUDPWorker::_ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal &_ret)
+{
+
+}

@@ -12,8 +12,6 @@ class AcceptorTCP : public aev::AEventAbstract
 {
 public:
 
-    AcceptorTCP(aev::AEvRootConf & config, const std::string &ip, const unsigned port);
-
     AcceptorTCP(aev::AEvChildConf &&config, const std::string &ip, const unsigned port);
     virtual ~AcceptorTCP() override;
 
@@ -27,7 +25,34 @@ private:
     ConfigData _main_config {Config::glob().get_conf()};
 
     virtual void _ev_begin() override;
-    virtual void _ev_finish() override;
+    virtual void _evFinish() override;
+
+    virtual void _ev_stop() override;
+
+    virtual void _ev_timeout() override;
+    virtual void _ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal & _ret) override;
+
+    void _start_acceept();
+
+};
+
+class AcceptorUDP : public aev::AEventAbstract
+{
+public:
+
+    AcceptorUDP(aev::AEvChildConf &&config, const std::string &ip, const unsigned port);
+    virtual ~AcceptorUDP() override;
+
+private:
+    asio::ip::udp::socket _socket;
+    asio::ip::udp::endpoint _sender_endpoint;
+    std::string _conn_ip;
+    unsigned _conn_port;
+    // Init config by static object method.
+    ConfigData _main_config {Config::glob().get_conf()};
+
+    virtual void _ev_begin() override;
+    virtual void _evFinish() override;
 
     virtual void _ev_stop() override;
 

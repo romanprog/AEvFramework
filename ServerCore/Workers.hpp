@@ -7,15 +7,15 @@
 
 using DnsReadBufferPtr = std::shared_ptr<DnsReadBuffer>;
 
-class DnsTCPSession : public aev::AEventAbstract
+class DnsTCPWorker : public aev::AEventAbstract
 {
 public:
 
-    explicit DnsTCPSession(aev::AEvChildConf && config,
+    explicit DnsTCPWorker(aev::AEvChildConf && config,
                             asio::ip::tcp::socket && _soc,
                             ConfigData main_conf_);
 
-    virtual ~DnsTCPSession() override;
+    virtual ~DnsTCPWorker() override;
 
 private:
 
@@ -25,7 +25,35 @@ private:
 
 protected:
     virtual void _ev_begin() override;
-    virtual void _ev_finish() override;
+    virtual void _evFinish() override;
+    virtual void _ev_stop() override;
+    virtual void _ev_timeout() override;
+    virtual void _ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal & _ret) override;
+
+    void _receive_request();
+    void _db_search(DnsReadBufferPtr buff_);
+    void _send_respond(std::string data);
+
+};
+
+
+class DnsUDPWorker : public aev::AEventAbstract
+{
+public:
+
+    explicit DnsUDPWorker(aev::AEvChildConf && config,
+                            ConfigData main_conf_, asio::ip::udp::endpoint && r_epoint_, DnsReadBufferPtr buff_);
+
+    virtual ~DnsUDPWorker() override;
+
+private:
+    asio::ip::udp::endpoint _remote_endpoint;
+    ConfigData _main_config;
+    DnsReadBufferPtr _read_buffer;
+
+protected:
+    virtual void _ev_begin() override;
+    virtual void _evFinish() override;
     virtual void _ev_stop() override;
     virtual void _ev_timeout() override;
     virtual void _ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal & _ret) override;
