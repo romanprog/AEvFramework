@@ -90,11 +90,12 @@ void DnsTCPWorker::_send_respond(std::string data)
 
 
 
-DnsUDPWorker::DnsUDPWorker(aev::AEvChildConf &&config, ConfigData main_conf_, asio::ip::udp::endpoint &&r_epoint_, DnsReadBufferPtr buff_)
+DnsUDPWorker::DnsUDPWorker(aev::AEvChildConf &&config, ConfigData main_conf_, UdpEndpointPtr &&r_epoint_, DnsReadBufferPtr &&buff_, asio::ip::udp::socket &sock_)
     : AEventAbstract::AEventAbstract(std::move(config)),
       _remote_endpoint(std::move(r_epoint_)),
       _main_config(std::move(main_conf_)),
-      _read_buffer(buff_)
+      _read_buffer(std::move(buff_)),
+      _sock(sock_)
 {
 
 }
@@ -106,7 +107,7 @@ DnsUDPWorker::~DnsUDPWorker()
 
 void DnsUDPWorker::_ev_begin()
 {
-
+    _send_respond();
 }
 
 void DnsUDPWorker::_evFinish()
@@ -127,4 +128,15 @@ void DnsUDPWorker::_ev_timeout()
 void DnsUDPWorker::_ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal &_ret)
 {
 
+}
+
+void DnsUDPWorker::_send_respond()
+{
+    _sock.async_send_to(
+                asio::buffer(_read_buffer->data(), _read_buffer->size_filled()), *_remote_endpoint,
+                [this](std::error_code ec, std::size_t bytes_sent)
+    {
+        log_debug("UDP respond sended.");
+        stop();
+    });
 }

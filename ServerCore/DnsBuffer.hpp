@@ -14,18 +14,13 @@ public:
     DnsBuffer();
 
     bool prepare_for_request(const std::string & name, dns::DnsQType t);
-
     bool prepare_for_respond();
-
     bool read_respond(size_t bytes_readed);
-
     dns::DnsError get_error() const
     {
         return err;
     }
-
     dns::DnsRespondPtr withdraw_respond();
-
     void clear();
 
 private:

@@ -56,6 +56,8 @@ void Controller::_start_acceeptors()
 {
     log_debug("Starting TCP acceptor on %, port %", _main_config.bind_ip, _main_config.port);
     create_child<AcceptorTCP>(aev::NoTimeout, _main_config.bind_ip, _main_config.port);
+    log_debug("Starting UDP acceptor on %, port %", _main_config.bind_ip, _main_config.port);
+    create_child<AcceptorUDP>(aev::NoTimeout, _main_config.bind_ip, _main_config.port);
 }
 
 void Controller::_reload_config()

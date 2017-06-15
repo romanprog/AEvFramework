@@ -5,7 +5,7 @@
 #include "../HUtils/HNet.hpp"
 #include "DnsBuffer.hpp"
 #include "Workers.hpp"
-
+#include "Types.hpp"
 #include <iostream>
 
 class AcceptorTCP : public aev::AEventAbstract
@@ -44,8 +44,10 @@ public:
     virtual ~AcceptorUDP() override;
 
 private:
+
     asio::ip::udp::socket _socket;
-    asio::ip::udp::endpoint _sender_endpoint;
+    DnsReadBufferPtr _reading_buffer;
+    UdpEndpointPtr _sender_endpoint;
     std::string _conn_ip;
     unsigned _conn_port;
     // Init config by static object method.
@@ -59,7 +61,7 @@ private:
     virtual void _ev_timeout() override;
     virtual void _ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSignal & _ret) override;
 
-    void _start_acceept();
+    void _listen_and_read();
 
 };
 

@@ -2,6 +2,7 @@
 #include "DnsBuffer.hpp"
 #include "../HUtils/HNet.hpp"
 #include "../AsyncEvent/SysSig/AEvSysSig.hpp"
+#include "Workers.hpp"
 
 AcceptorTCP::AcceptorTCP(aev::AEvChildConf &&config, const std::string &ip, const unsigned port)
     :aev::AEventAbstract(std::move(config)),
@@ -108,11 +109,12 @@ void AcceptorUDP::_ev_begin()
 
     asio::ip::udp::resolver resolver(_ev_loop->get_io_service());
     asio::ip::udp::endpoint endpoint = *resolver.resolve({_conn_ip, std::to_string(_conn_port)});
+    _socket.open(asio::ip::udp::v4());
     _socket.bind(endpoint);
 
     create_child<aev::AEvSysSig>(0);
     // Init SMTP protocol handlers map.
-    _start_acceept();
+    _listen_and_read();
 }
 
 void AcceptorUDP::_evFinish()
@@ -135,7 +137,26 @@ void AcceptorUDP::_ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSign
 
 }
 
-void AcceptorUDP::_start_acceept()
+void AcceptorUDP::_listen_and_read()
 {
+    _reading_buffer = std::make_unique<DnsReadBuffer>();
+    _sender_endpoint = std::make_unique<asio::ip::udp::endpoint>();
+    _reading_buffer->release(512);
+    _socket.async_receive_from(
+                asio::buffer(_reading_buffer->data_top(), _reading_buffer->size_avail()), *_sender_endpoint,
+                [this] (std::error_code ec, std::size_t bytes_recvd)
+    {
+        if (!ec && bytes_recvd > 0)
+        {
+            log_main("Readed UDP data. Ip:%, size: %", _sender_endpoint->address().to_string(), bytes_recvd);
+            _reading_buffer->accept(bytes_recvd);
+            create_child<DnsUDPWorker>(aev::NoTimeout, std::move(_main_config),
+                                       std::move(_sender_endpoint),
+                                       std::move(_reading_buffer),
+                                       _socket);
+            // wait(sender_endpoint, bytes_recvd);
+        }
+        _listen_and_read();
 
+    });
 }

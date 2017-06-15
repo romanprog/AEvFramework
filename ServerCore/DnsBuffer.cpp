@@ -78,7 +78,6 @@ void DnsBuffer::when_new_data_acc(size_t bytes_readed)
 
 }
 
-
 DnsReadBuffer::DnsReadBuffer()
     :BuffAbstract(512,0)
 {
