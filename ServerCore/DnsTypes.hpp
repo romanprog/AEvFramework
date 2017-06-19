@@ -161,7 +161,8 @@ struct DnsPkgAnswer
     uint16_t preference {0};
     // Answered name (or IP).
     std::string answer;
-
+    // Answer data begin.
+    const char * data;
 };
 
 struct DnsRequest

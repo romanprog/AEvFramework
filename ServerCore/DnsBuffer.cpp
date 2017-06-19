@@ -78,9 +78,27 @@ void DnsBuffer::when_new_data_acc(size_t bytes_readed)
 
 }
 
-DnsReadBuffer::DnsReadBuffer()
+DnsRequestBuffer::DnsRequestBuffer()
     :BuffAbstract(512,0)
 {
 
+}
+
+void DnsRequestBuffer::clear()
+{
+    reset();
+}
+
+void DnsRequestBuffer::parse()
+{
+    err = dns::utils::buff_parse(vdata(), _respond);
+    if (err != dns::DnsError::noerror) {
+        log_debug("Parse ERROR");
+        reset();
+        // return false;
+    }
+    log_main(_respond.alist[1].req_name);
+    log_debug("Parse OK");
+    // return true;
 }
 

@@ -2,8 +2,9 @@
 #define TYPES
 
 #include <memory>
+#include <asio.hpp>
 
-using DnsReadBufferPtr = std::unique_ptr<DnsReadBuffer>;
+
 using UdpEndpointPtr = std::unique_ptr<asio::ip::udp::endpoint>;
 
 

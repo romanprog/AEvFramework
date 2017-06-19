@@ -323,5 +323,23 @@ std::string get_rand_rec_value(const DnsRespond &resp)
 
 }
 
+DnsError buff_parse(const void *buffer, dns::DnsRespond & res)
+{
+    res.alist.resize(res.header.a_count);
+    for (int i = 0; i < res.header.a_count; ++i) {
+        DnsPkgAnswer a_tmp;
+        utils::buff_step_read_qdn(buff_begin, cursor, res.alist[i].req_name);
+        res.alist[i].type = static_cast<DnsQType>(utils::buff_step_read<uint16_t>(cursor));
+        res.alist[i].cls = utils::buff_step_read<uint16_t>(cursor);
+        res.alist[i].ttl = utils::buff_step_read<uint32_t>(cursor);
+        res.alist[i].dsize = utils::buff_step_read<uint16_t>(cursor);
+        res.alist[i].answer = "test";
+        res.alist[i].data = cursor;
+        // Set corsor to the end of curent data set.
+        cursor += res.alist[i].dsize;
+    }
+    return DnsError::noerror;
+}
+
 } // namespace utils
 } //namespace dns

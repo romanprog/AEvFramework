@@ -4,9 +4,13 @@
 #include "../AsyncEvent/BufferBase/PBufferAbstract.hpp"
 #include "DnsTypes.hpp"
 #include "DnsUtils.hpp"
+#include "../Logger/Logger.hpp"
 
 #include <string>
 #include <vector>
+
+class DnsRequestBuffer;
+using DnsReadBufferPtr = std::unique_ptr<DnsRequestBuffer>;
 
 class DnsBuffer : public BuffAbstract
 {
@@ -35,23 +39,25 @@ private:
 };
 
 
-class DnsReadBuffer : public BuffAbstract
+class DnsRequestBuffer : public BuffAbstract
 {
 public:
-    DnsReadBuffer();
+    DnsRequestBuffer();
 
     inline dns::DnsError get_error() const
     {
         return err;
     }
 
+
     void clear();
+    void parse();
 
 private:
 
     dns::DnsError err;
+    dns::DnsRespond _respond;
     dns::DnsRequest _request;
-    dns::DnsRespondPtr _respond_ptr;
 };
 
 

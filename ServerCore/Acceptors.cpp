@@ -139,7 +139,7 @@ void AcceptorUDP::_ev_child_callback(aev::AEvPtrBase child_ptr, aev::AEvExitSign
 
 void AcceptorUDP::_listen_and_read()
 {
-    _reading_buffer = std::make_unique<DnsReadBuffer>();
+    _reading_buffer = std::make_unique<DnsRequestBuffer>();
     _sender_endpoint = std::make_unique<asio::ip::udp::endpoint>();
     _reading_buffer->release(512);
     _socket.async_receive_from(

@@ -21,7 +21,7 @@ private:
 
     asio::ip::tcp::socket _socket;
     ConfigData _main_config;
-    DnsReadBufferPtr read_buffer {std::make_unique<DnsReadBuffer>()};
+    DnsReadBufferPtr read_buffer {std::make_unique<DnsRequestBuffer>()};
 
 protected:
     virtual void _ev_begin() override;

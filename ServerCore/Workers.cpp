@@ -107,6 +107,8 @@ DnsUDPWorker::~DnsUDPWorker()
 
 void DnsUDPWorker::_ev_begin()
 {
+    // log_main("%", std::string(_read_buffer->data(), _read_buffer->size_filled()));
+    _read_buffer->parse();
     _send_respond();
 }
 

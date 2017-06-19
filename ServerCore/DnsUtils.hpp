@@ -92,6 +92,37 @@ size_t request_buff_write(void * buffer, DnsRequest req);
 // req_id used to compare respont and request. 0 - don't check (not recomended).
 DnsError respond_buff_parse(const void *buffer, DnsRespond & res, uint16_t req_id = 0);
 
+// Universal parser. Get data from any DNS record.
+template <typename T>
+DnsError buff_requers_parse(const void *buffer, T &res)
+{
+    const char * cursor = static_cast<const char *>(buffer);
+    const char * const buff_begin = static_cast<const char * const>(buffer);
+
+    const DnsPkgHeaderMap * dns_header_map = reinterpret_cast<const DnsPkgHeaderMap *> (buffer);
+
+    res.header.id = utils::buff_read<uint16_t>(dns_header_map->ident);
+
+    // Get error status from DNS flag.
+    res.header.error = utils::get_error(dns_header_map->flags);
+
+    // Server return error.
+    if (res.header.error)
+        return DnsError::resolv_err;
+
+    res.header.q_count = utils::buff_read<uint16_t>(dns_header_map->QDcount);
+    res.header.a_count = utils::buff_read<uint16_t>(dns_header_map->ANcount);
+
+    cursor += sizeof(DnsPkgHeaderMap);
+
+    for (int i = 0; i < res.header.q_count; ++i) {
+        utils::buff_step_read_qdn(buff_begin, cursor, res.qlist[i].name);
+        res.qlist[i].type = static_cast<DnsQType>(utils::buff_step_read<uint16_t>(cursor));
+        res.qlist[i].cls = utils::buff_step_read<uint16_t>(cursor);
+    }
+}
+
+
 // Create DnsRequest obj.
 DnsError create_request(const std::string & req_str, DnsQType t, DnsRequest & req);
 
