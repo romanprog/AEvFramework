@@ -4,7 +4,7 @@
 #include <iostream>
 
 DnsBuffer::DnsBuffer()
-    :_respond_ptr(std::make_unique<dns::DnsRespond>())
+    :_respond_ptr(std::make_unique<dns::DnsQuery>())
 { }
 
 bool DnsBuffer::prepare_for_request(const std::string &name, dns::DnsQType t)
@@ -45,7 +45,7 @@ bool DnsBuffer::read_respond(size_t bytes_readed)
         return false;
 
     accept(bytes_readed);
-    err = dns::utils::respond_buff_parse(vdata(), *_respond_ptr, _request.header.id);
+    err = dns::utils::buff_parse(vdata(), *_respond_ptr);
     if (err != dns::DnsError::noerror) {
         reset();
         return false;
@@ -61,8 +61,8 @@ dns::DnsRespondPtr DnsBuffer::withdraw_respond()
 void DnsBuffer::clear()
 {
     reset();
-    _request = dns::DnsRequest();
-    _respond_ptr = std::make_unique<dns::DnsRespond>();
+    _request = dns::DnsQuery();
+    _respond_ptr = std::make_unique<dns::DnsQuery>();
 }
 
 size_t DnsBuffer::calculate_mem(size_t block_size)

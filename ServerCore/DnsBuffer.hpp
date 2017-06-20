@@ -34,7 +34,7 @@ private:
     dns::DnsError err;
 
     bool redy_for_respond {false};
-    dns::DnsRequest _request;
+    dns::DnsQuery _request;
     dns::DnsRespondPtr _respond_ptr;
 };
 
@@ -56,8 +56,8 @@ public:
 private:
 
     dns::DnsError err;
-    dns::DnsRespond _respond;
-    dns::DnsRequest _request;
+    dns::DnsQuery _respond;
+    dns::DnsQuery _request;
 };
 
 

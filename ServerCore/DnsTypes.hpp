@@ -165,15 +165,7 @@ struct DnsPkgAnswer
     const char * data;
 };
 
-struct DnsRequest
-{
-    // Request header
-    DnsPkgHeader header;
-    // Queries list.
-    std::vector<DnsPkgQuery> qlist;
-};
-
-struct DnsRespond
+struct DnsQuery
 {
     // Respond header.
     DnsPkgHeader header;
@@ -183,7 +175,7 @@ struct DnsRespond
     std::vector<DnsPkgAnswer> alist;
 };
 
-using DnsRespondPtr = std::unique_ptr<DnsRespond>;
+using DnsRespondPtr = std::unique_ptr<DnsQuery>;
 
 class DnsUIBase;
 

@@ -165,7 +165,7 @@ bool is_fqdn(const std::string &name)
     return true;
 }
 
-size_t request_buff_write(void *buffer, DnsRequest req)
+size_t request_buff_write(void *buffer, DnsQuery req)
 {
     // ToDo exeption!!
     // Need testd when parsed invalid data.
@@ -211,65 +211,8 @@ size_t request_buff_write(void *buffer, DnsRequest req)
     return static_cast<size_t>(cursor - first);
 }
 
-DnsError respond_buff_parse(const void *buffer, DnsRespond &res, uint16_t req_id)
-{
-    const char * cursor = static_cast<const char *>(buffer);
-    const char * const buff_begin = static_cast<const char * const>(buffer);
 
-    const DnsPkgHeaderMap * dns_header_map = reinterpret_cast<const DnsPkgHeaderMap *> (buffer);
-
-    res.header.id = utils::buff_read<uint16_t>(dns_header_map->ident);
-
-    // Is this respond to appropriate request?
-    if (req_id && (req_id != res.header.id))
-        return DnsError::id_match_err;
-
-    // Get error status from DNS flag.
-    res.header.error = utils::get_error(dns_header_map->flags);
-
-    // Server return error.
-    if (res.header.error)
-        return DnsError::resolv_err;
-
-    res.header.q_count = utils::buff_read<uint16_t>(dns_header_map->QDcount);
-    res.header.a_count = utils::buff_read<uint16_t>(dns_header_map->ANcount);
-
-    cursor += sizeof(DnsPkgHeaderMap);
-
-    for (int i = 0; i < res.header.q_count; ++i) {
-        std::string name;
-        utils::buff_step_read_qdn(buff_begin, cursor, name);
-        auto type = static_cast<DnsQType>(utils::buff_step_read<uint16_t>(cursor));
-        auto cls = utils::buff_step_read<uint16_t>(cursor);
-        res.qlist.emplace_back(name, type, cls);
-    }
-
-    for (int i = 0; i < res.header.a_count; ++i) {
-        DnsPkgAnswer a_tmp;
-        utils::buff_step_read_qdn(buff_begin, cursor, a_tmp.req_name);
-        a_tmp.type = static_cast<DnsQType>(utils::buff_step_read<uint16_t>(cursor));
-        a_tmp.cls = utils::buff_step_read<uint16_t>(cursor);
-        a_tmp.ttl = utils::buff_step_read<uint32_t>(cursor);
-        a_tmp.dsize = utils::buff_step_read<uint16_t>(cursor);
-
-        switch (a_tmp.type) {
-        case DnsQType::A:
-            a_tmp.answer = utils::ip_step_read(cursor);
-            break;
-        case DnsQType::PTR:
-            utils::buff_step_read_qdn(buff_begin, cursor, a_tmp.answer);
-            break;
-        case DnsQType::MX:
-            a_tmp.preference = utils::buff_step_read<uint16_t>(cursor);
-            utils::buff_step_read_qdn(buff_begin, cursor, a_tmp.answer);
-            break;
-        }
-        res.alist.push_back(a_tmp);
-    }
-    return DnsError::noerror;
-}
-
-DnsError create_request(const std::string &req_str, DnsQType t, DnsRequest &req)
+DnsError create_request(const std::string &req_str, DnsQType t, DnsQuery &req)
 {
     // Validate
     if (t == DnsQType::PTR && !utils::is_ip_v4(req_str))
@@ -287,7 +230,7 @@ DnsError create_request(const std::string &req_str, DnsQType t, DnsRequest &req)
     return DnsError::noerror;
 }
 
-std::map<uint16_t, std::string> get_mx_sorted(const DnsRespond &resp)
+std::map<uint16_t, std::string> get_mx_sorted(const DnsQuery &resp)
 {
     std::map<uint16_t, std::string> result;
     for (auto & rec : resp.alist)
@@ -297,7 +240,7 @@ std::map<uint16_t, std::string> get_mx_sorted(const DnsRespond &resp)
     return result;
 }
 
-std::vector<std::string> get_rec_list(const DnsRespond &resp)
+std::vector<std::string> get_rec_list(const DnsQuery &resp)
 {
     std::vector<std::string> result;
     for (auto & rec : resp.alist)
@@ -307,7 +250,7 @@ std::vector<std::string> get_rec_list(const DnsRespond &resp)
     return result;
 }
 
-std::string get_rand_rec_value(const DnsRespond &resp)
+std::string get_rand_rec_value(const DnsQuery &resp)
 {
 
     if (resp.alist.size() == 1)
@@ -323,8 +266,37 @@ std::string get_rand_rec_value(const DnsRespond &resp)
 
 }
 
-DnsError buff_parse(const void *buffer, dns::DnsRespond & res)
+DnsError buff_parse(const void *buffer, dns::DnsQuery & res)
 {
+    const char * cursor = static_cast<const char *>(buffer);
+    const char * const buff_begin = static_cast<const char * const>(buffer);
+
+    const DnsPkgHeaderMap * dns_header_map = reinterpret_cast<const DnsPkgHeaderMap *> (buffer);
+
+    res.header.id = utils::buff_read<uint16_t>(dns_header_map->ident);
+
+    // Is this respond to appropriate request?
+    // if (req_id && (req_id != res->header.id))
+    //    return DnsError::id_match_err;
+
+    // Get error status from DNS flag.
+    res.header.error = utils::get_error(dns_header_map->flags);
+
+    // Server return error.
+    if (res.header.error)
+        return DnsError::resolv_err;
+
+    res.header.q_count = utils::buff_read<uint16_t>(dns_header_map->QDcount);
+    res.header.a_count = utils::buff_read<uint16_t>(dns_header_map->ANcount);
+
+    cursor += sizeof(DnsPkgHeaderMap);
+
+    for (int i = 0; i < res.header.q_count; ++i) {
+        utils::buff_step_read_qdn(buff_begin, cursor, res.qlist[i].name);
+        res.qlist[i].type = static_cast<DnsQType>(utils::buff_step_read<uint16_t>(cursor));
+        res.qlist[i].cls = utils::buff_step_read<uint16_t>(cursor);
+    }
+
     res.alist.resize(res.header.a_count);
     for (int i = 0; i < res.header.a_count; ++i) {
         DnsPkgAnswer a_tmp;
@@ -338,7 +310,22 @@ DnsError buff_parse(const void *buffer, dns::DnsRespond & res)
         // Set corsor to the end of curent data set.
         cursor += res.alist[i].dsize;
     }
+
+#if 0
     return DnsError::noerror;
+    switch (a_tmp.type) {
+    case DnsQType::A:
+        a_tmp.answer = utils::ip_step_read(cursor);
+        break;
+    case DnsQType::PTR:
+        utils::buff_step_read_qdn(buff_begin, cursor, a_tmp.answer);
+        break;
+    case DnsQType::MX:
+        a_tmp.preference = utils::buff_step_read<uint16_t>(cursor);
+        utils::buff_step_read_qdn(buff_begin, cursor, a_tmp.answer);
+        break;
+    }
+#endif
 }
 
 } // namespace utils
