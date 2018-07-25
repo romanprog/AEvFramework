@@ -121,6 +121,9 @@ struct AEvUtilConf
 // Default time in seconds for run timer event. (If event config created with 0 timeout).
 static const size_t ev_default_timecheck = 5;
 
+// Constant for run AEV child without timeout.
+const unsigned NoTimeout {0};
+
 } //namespace aev
 
 #endif // AEVENTSTYPS_HPP

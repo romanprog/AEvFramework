@@ -19,7 +19,7 @@ void AEvSysSig::_ev_begin()
 
 }
 
-void AEvSysSig::_ev_finish()
+void AEvSysSig::_evFinish()
 {
 
 }

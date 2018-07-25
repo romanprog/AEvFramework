@@ -34,11 +34,8 @@ struct ConfigData
 {
     // options:
     uint logging_level {1};
-    std::string redis_host;
-    uint redis_port;
-    std::string primary_hostname;
-    std::string smtp_welcome;
-
+    std::string bind_ip;
+    unsigned port {53};
 };
 
 class Config

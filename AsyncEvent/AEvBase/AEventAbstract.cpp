@@ -60,7 +60,7 @@ void AEventAbstract::finish()
 {
       _timer.cancel();
     //log_debug_aev("Try call _ev_finish ");
-    _ev_finish();
+    _evFinish();
     _finish_callback(std::move(_my_ptr), _ev_exit_signal);
 }
 
@@ -132,6 +132,10 @@ int AEventAbstract::_child_callback(AEvPtrBase _child, AEvExitSignal _ret)
     _child_ev_list.erase(_child);
     // log_debug_aev("Try call _ev_child_callback ");
     _ev_child_callback(_child, _ret);
+
+    // If no childs - stop event.
+    if (_child_ev_list.empty())
+        stop();
 
     return 0;
 }

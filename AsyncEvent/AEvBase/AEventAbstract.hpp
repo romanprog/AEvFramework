@@ -1,7 +1,6 @@
 #ifndef AEVENTSABSTRACT_HPP
 #define AEVENTSABSTRACT_HPP
 #include "../../Logger/Logger.hpp"
-
 #include "AEventTypes.hpp"
 
 namespace aev {
@@ -44,7 +43,7 @@ protected:
 
     // Virtual methods.
     virtual void _ev_begin() = 0;
-    virtual void _ev_finish() = 0;
+    virtual void _evFinish() = 0;
     virtual void _ev_stop() = 0;
     virtual void _ev_timeout() = 0;
     virtual void _ev_child_callback(AEvPtrBase child_ptr, AEvExitSignal & _ret) = 0;
